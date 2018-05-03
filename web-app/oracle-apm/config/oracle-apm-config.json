@@ -1,0 +1,13 @@
+{
+  "tenant": "nlamistrial73269",
+  "registrationKey": "EQAAAA9idWlsdEluQUxDS2V5LjEhR93pM784zTGm1tSMeKt9uJEH5ZaiQTCcs1u4qrRZM4szTtBEOUa3I+4cg8m33NYAAAAAsQosrQ==",
+  "auth": "EQAAAA9idWlsdEluQUxDS2V5LjPQldYjhG4UeToR+Mliwkp26iJoFBuy73kJ5VNHNwPBbRpx1h167tHJDMoE6CQ6l6CU5yK+UpYywysLa8c3QKFg3yPbyxuprE+DLZJ3eIJUWBfVenmkENmF5Stu3lIv+QojtnKC3PCnuMM40kGA5+2/aQ+v99ulIwdoaawa0iUeGwAAAABHDvuG",
+  "MCAccessRateSeconds": 60,
+  "MEIDCheckRateSeconds": 60,
+  "debug": true,
+  "uploadRoot": "https://nlamistrial73269.itom.management.us2.oraclecloud.com/",
+  "collectorRoot": "https://nlamistrial73269.itom2.management.us2.oraclecloud.com",
+  "injectionType": "correlation",
+  "hostName": "lt2292.group.wan",
+  "hostNameOverride": "false"
+}
