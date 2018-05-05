@@ -1,0 +1,10 @@
+{
+    "memory": "1G",
+    "instances": "1",  
+    "environment": {
+        "EVENT_HUB_PUBLIC_IP":"129.150.77.116",
+        "KAFKA_TOPIC":"a516817-tweetstopic",
+        "ZOOKEEPER_PORT": "2181",
+        "TWITTER_HASHTAGS" :"oraclecode,java,devoxxUK"
+    }
+  }
