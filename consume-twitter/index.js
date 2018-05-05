@@ -1,11 +1,32 @@
 var Twit = require('twit');
 const express = require('express');
+var https = require('https')
+, http = require('http')
 const app = express();
-
+var PORT = process.env.APP_PORT || 8144;
+const server = http.createServer(app);
+var APP_VERSION ="0.0.3"
 const { twitterconfig } = require('./twitterconfig');
 
+const startTime = new Date()
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
+var tweetCount =0;
+app.get('/about', function (req, res) {
+  var about = {
+    "about": "Twitter Consumer and Producer to "+TOPIC_NAME,
+    "PORT": process.env.PORT,
+   "APP_VERSION ": APP_VERSION,
+   "Running Since": startTime,
+   "Total number of tweets processed" : tweetCount
+
+  }
+  res.json(about);
+})
+server.listen(PORT, function listening() {
+  console.log('Listening on %d', server.address().port);
+});
+
 
 var T = new Twit({
   consumer_key: twitterconfig.consumer_key,
@@ -42,11 +63,10 @@ function tweetstream(hashtags, tweetStream) {
 const kafka = require('kafka-node');
 const APP_NAME ="TwitterConsumer"
 
-var EVENT_HUB_PUBLIC_IP = process.env.KAFKA_HOST ||'129.150.77.116';
-var TOPIC_NAME = process.env.KAFKA_TOPIC ||'a516817-tweetstopic';
-// var EVENT_HUB_PUBLIC_IP = process.env.KAFKA_HOST ||'192.168.188.102';
-// var TOPIC_NAME = process.env.KAFKA_TOPIC ||'tweets-topic';
-var ZOOKEEPER_PORT = process.env.ZOOKEEPER_PORT ||2181;
+// var EVENT_HUB_PUBLIC_IP = process.env.KAFKA_HOST ||'129.150.77.116';
+// var TOPIC_NAME = process.env.KAFKA_TOPIC ||'a516817-tweetstopic';
+var EVENT_HUB_PUBLIC_IP = process.env.KAFKA_HOST ||'192.168.188.102';
+var TOPIC_NAME = process.env.KAFKA_TOPIC ||'tweets-topic';
 
 var Producer = kafka.Producer;
 var client = new kafka.Client(EVENT_HUB_PUBLIC_IP );
@@ -66,6 +86,7 @@ let payloads = [
 ];
 
 function produceTweetEvent(tweet) {
+  try {
       // find out which of the original hashtags { track: ['oraclecode', 'java', 'devoxxUK'] } in the hashtags for this tweet; 
     //that is the one for the tagFilter property
     // select one other hashtag from tweet.entities.hashtags to set in property hashtag
@@ -96,7 +117,11 @@ function produceTweetEvent(tweet) {
       , "originalTweetId": tweet.retweeted_status ? tweet.retweeted_status.id : null
     };
     eventPublisher.publishEvent(tweet.id,tweetEvent)
-}
+    tweetCount++
+  } catch (e) {
+    console.log("Exception in publishing Tweet Event "+JSON.stringify(e))
+  }
+  }
 
 var eventPublisher = module.exports;
 
@@ -112,6 +137,5 @@ var eventPublisher = module.exports;
       }
       console.log("Published event with key " + eventKey + " to topic " + TOPIC_NAME + " :" + JSON.stringify(data));
     });
-  
-  }
+  }//publishEvent
 
