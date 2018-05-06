@@ -18,6 +18,13 @@
            elementToToggle.style.display = elementToToggle.style.display=='none'?'':'none'; 
         }
     </script>
+<style >
+td { 
+    padding: 10px;
+}
+    .tweetLikeCount {font-weight: bold; background-color: coral}
+</style>
+
 </head>
 
 <body>
@@ -40,7 +47,7 @@
             </table>
         </div>
         <br/>
-        <a href="#" onclick="toggle('runningTop3TweetLikes')">Toggle Running Top 3 Tweet Likes</a>
+        <a href="#" onclick="toggle('runningTop3TweetLikes')">Toggle Running Top 3 Tweet Likes (over last 60 seconds)</a>
         <div id="runningTop3TweetLikes" style="display:none">
             <h2>Running Top 3 Tweet Likes</h2>
             <table id="recentLikesTable">
@@ -50,10 +57,10 @@
                     <th>Running Top 3</th>
                 </tr>
                 <tr>
-                    <td id="oow17Top3LikesTime"></td>
-                    <td>Oracle OpenWorld</th>
+                    <td id="devoxxUKTop3LikesTime"></td>
+                    <td>Devoxx UK</th>
                         <td>
-                            <table id="oow17Top3LikesTimeTable">
+                            <table id="devoxxUKTop3LikesTimeTable">
                                 <tr>
                                     <th>Tweet</th>
                                     <th>Author</th>
@@ -63,10 +70,10 @@
                         </td>
                 </tr>
                 <tr>
-                    <td id="javaoneTop3LikesTime"></td>
-                    <td>JavaOne</th>
+                    <td id="javaTop3LikesTime"></td>
+                    <td>Java</th>
                         <td>
-                            <table id="javaoneTop3LikesTimeTable">
+                            <table id="javaTop3LikesTimeTable">
                                 <tr>
                                     <th>Tweet</th>
                                     <th>Author</th>
@@ -101,15 +108,15 @@
                 </tr>
                 <tr>
                     <td>Devoxx UK</td>
-                    <td><span id="oraclecodeTweetCount"></span></td>
+                    <td><span id="devoxxUKTweetCount"></span></td>
                 </tr>
                 <tr>
                     <td>Java</td>
-                    <td><span id="javaoneTweetCount"></span></td>
+                    <td><span id="javaTweetCount"></span></td>
                 </tr>
                 <tr>
                     <td>OracleCode</td>
-                    <td><span id="oow17TweetCount"></span></td>
+                    <td><span id="oraclecodeTweetCount"></span></td>
                 </tr>
             </table>
         </div>

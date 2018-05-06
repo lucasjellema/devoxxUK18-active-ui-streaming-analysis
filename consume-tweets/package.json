@@ -1,0 +1,17 @@
+{
+  "name": "consumer",
+  "version": "1.0.0",
+  "description": "Simple consumer of events of a Kafka Topic",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    
+  ],
+  "author": "Kunal Rupani/Lucas Jellema",
+  "license": "ISC",
+  "dependencies": {
+    "kafka-node": "^2.2.2"
+  }
+}

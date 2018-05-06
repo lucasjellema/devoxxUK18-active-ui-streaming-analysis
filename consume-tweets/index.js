@@ -1,29 +1,27 @@
-var kafka = require('kafka-node');
 
-
-var tweetAnalyticsListener = module.exports;
-var subscribers = [];
-
-tweetAnalyticsListener.subscribeToTweetAnalytics = function( callback) {
-  subscribers.push(callback);
-}
 //var KAFKA_SERVER_PORT = 6667;
 var KAFKA_ZK_SERVER_PORT = 2181;
 
-var kafkaHost = process.env.KAFKA_HOST || "192.168.188.102";
-var zookeeperPort = process.env.ZOOKEEPER_PORT || 2181;
-var TOPIC_NAME = process.env.KAFKA_TOPIC ||'TWEET_COUNT';
+var EVENT_HUB_PUBLIC_IP = '129.150.77.116';
+var TOPIC_NAME = 'a516817-tweetstopic';
+//var ZOOKEEPER_PORT = 2181;
+// Docker VM 
+// tru event hub var EVENT_HUB_PUBLIC_IP = '129.144.150.24';
+// local Kafka Cluster
+//var EVENT_HUB_PUBLIC_IP = '192.168.188.102';
 
+// tru event hub var TOPIC_NAME = 'partnercloud17-microEventBus';
+//var TOPIC_NAME = 'tweetsTopic';
 
 var consumerOptions = {
-  host :kafkaHost+":"+zookeeperPort,
-  groupId: 'consume-tweetAnalytics-for-web-app',
+    host: EVENT_HUB_PUBLIC_IP + ':' + KAFKA_ZK_SERVER_PORT ,
+    groupId: 'consume-tweets',
     sessionTimeout: 15000,
     protocol: ['roundrobin'],
-    encoding: 'buffer',
     fromOffset: 'earliest' // equivalent of auto.offset.reset valid values are 'none', 'latest', 'earliest'
   };
   
+var kafka = require('kafka-node');
 var topics = [TOPIC_NAME];
 var consumerGroup = new kafka.ConsumerGroup(Object.assign({id: 'consumer1'}, consumerOptions), topics);
 consumerGroup.on('error', onError);
@@ -36,15 +34,7 @@ function onError (error) {
   
   function onMessage (message) {
     console.log('%s read msg Topic="%s" Partition=%s Offset=%d', this.client.clientId, message.topic, message.partition, message.offset);
-    // the message.value contains the JSON representation of the event published by KSQL on the Topic
-    var event = JSON.parse(message.value)
-    var conference =event.TAGFILTER||'java' ;
-    var count = event.TAG_CNT;
-    subscribers.forEach( (subscriber) => {
-        subscriber(JSON.stringify({"eventType":"tweetAnalytics","conference":conference, "tweetCount":count}
-      ));
-        
-    })
+    console.log("Tweet:"+message.value);
   }
   
   process.once('SIGINT', function () {

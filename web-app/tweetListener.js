@@ -6,9 +6,9 @@ tweetListener.subscribeToTweets = function (callback) {
   subscribers.push(callback);
 }
 
-var kafkaHost = process.env.KAFKA_HOST || "ubuntu";
+var kafkaHost = process.env.KAFKA_HOST || "192.168.188.102";
 var zookeeperPort = process.env.ZOOKEEPER_PORT || 2181;
-var TOPIC_NAME = process.env.KAFKA_TOPIC ||'tweetsTopic';
+var TOPIC_NAME = process.env.KAFKA_TOPIC ||'tweets-topic';
 
 
 //var client = new kafka.Client(kafkaHost + ":"+zookeeperPort+"/")
@@ -27,8 +27,8 @@ consumerGroup.on('error', onError);
 consumerGroup.on('message', onMessage);
 
 function onMessage(message) {
-  console.log('%s read msg Topic="%s" Partition=%s Offset=%d', this.client.clientId, message.topic, message.partition, message.offset);
-  console.log("Message Value " + message.value)
+//  console.log('%s read msg Topic="%s" Partition=%s Offset=%d', this.client.clientId, message.topic, message.partition, message.offset);
+//  console.log("Message Value " + message.value)
 
   subscribers.forEach((subscriber) => {
     subscriber(message.value);

@@ -1,63 +1,48 @@
-var wsUri = "ws://" + document.location.host;
-var websocket = new WebSocket(wsUri);
+// assume that API service is published on same server that is the server of this HTML file
+var source = new EventSource("../updates");
+source.onmessage = function (event) {
+    var data = JSON.parse(event.data);
+    if (data.eventType == 'tweetAnalytics') {
+        console.log("Looking for element "+data.conference + "TweetCount");
+        var span = document.getElementById(data.conference + "TweetCount");
+        span.innerHTML = data.tweetCount;
+    } else {
+        if (data.eventType == 'tweetLikesAnalytics') {
+            var conference = data.conference;
+            console.log("Looking for element "+conference + "Top3LikesTime");
+            var timeCell = document.getElementById(conference + "Top3LikesTime");
+            timeCell.innerHTML = new Date().toLocaleTimeString();
+            console.log("Looking for element "+conference + "Top3LikesTimeTable");
+            var top3LikesTable = document.getElementById(conference + "Top3LikesTimeTable");
+            while (top3LikesTable.rows.length > 1) {
+                top3LikesTable.deleteRow(1);
+            }
+            for (i = 0; i < data.nrs.length; i++) {
+                if (data.nrs[i] && data.nrs[i].count) {
+                    var row = top3LikesTable.insertRow(i + 1); // after header
+                    var tweetCell = row.insertCell(0);
+                    var authorCell = row.insertCell(1);
+                    var countCell = row.insertCell(2);
+                    authorCell.innerHTML = data.nrs[i].author;
+                    tweetCell.innerHTML = data.nrs[i].text;
+                    countCell.innerHTML = data.nrs[i].count;
+                    countCell.classList.add('tweetLikeCount');
+                }
+            }//for
 
-websocket.onmessage = function (evt) { onMessage(evt) };
-websocket.onerror = function (evt) { onError(evt) };
-websocket.onopen = function (evt) { onOpen(evt) };
-
-function onMessage(evt) {
-    console.log("received over websockets: " + evt.data);
-    var message = JSON.parse(evt.data);
-    if (message.eventType == 'time') {
-        writeToScreen(message.time);
+        } else {
+            var table = document.getElementById("tweetsTable");
+            var row = table.insertRow(1); // after header
+            var likeCell = row.insertCell(0);
+            var conferenceCell = row.insertCell(1);
+            var authorCell = row.insertCell(2);
+            var tweetCell = row.insertCell(3);
+            var tagCell = row.insertCell(4);
+            conferenceCell.innerHTML = data.tagFilter;
+            authorCell.innerHTML = data.author;
+            tweetCell.innerHTML = data.text;
+            tagCell.innerHTML = data.hashtag;
+            likeCell.innerHTML = `<img src="images/like-tweet.jpg" width="40" onclick="like('${data.tweetId}')"/>`;
+        }
     }
-    if (message.eventType == 'tweetLiked') {
-        var likedTweet = message.likedTweet;
-        handleFreshTweetLike(likedTweet);
-        writeToScreen("TweetLiked: " + likedTweet.text);
-    }
-
-}
-
-function handleFreshTweetLike(likedTweet){
-    var table = document.getElementById("recentLikesTable");
-    var row = table.insertRow(1); // after header
-    var timeCell = row.insertCell(0);
-    var conferenceCell = row.insertCell(1);
-    var tweetCell = row.insertCell(2);
-    var tagCell = row.insertCell(3);
-    timeCell.innerHTML = new Date().toLocaleTimeString();
-    conferenceCell.innerHTML = likedTweet.tagFilter;
-    tweetCell.innerHTML = likedTweet.text;
-    tagCell.innerHTML = likedTweet.hashtag;
-
-    var rows = table.childNodes[1].childNodes;  // childNodes[1] us tableBody
-    if (rows.length>6) {
-        table.childNodes[1].removeChild(rows[6]);
-    }
-}
-
-function onError(evt) {
-    writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data);
-}
-
-function onOpen() {
-    writeToScreen("Connected to " + wsUri);
-}
-
-// For testing purposes
-var output = document.getElementById("output");
-
-function writeToScreen(message) {
-    if (output == null) { output = document.getElementById("output"); }
-    output.innerHTML = message + "";
-}
-
-function like(tweetId) {
-    sendText(JSON.stringify({ "eventType": "tweetLike", "tweetId": tweetId }));
-}
-
-function sendText(json) {
-    console.log("sending text: " + json);
-    websocket.send(json);
-}
+};//onMessage
