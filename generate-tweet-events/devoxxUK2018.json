@@ -1,0 +1,16 @@
+[{"title": "Using Istio to Build a Cloud Native Service Mesh"
+, "speakers":"Ryan Knight, Ray Tsang"}
+,{"title": "From Developer to Architect", "speakers":"Nathaniel Schutta"}
+,{"title": "Getting your hands dirty with deep learning in java", "speakers":"Dave Snowdon"}
+,{"title": "Java application security the hard way - a workshop for the serious developer", "speakers":"Steve Poole, Simon Maple"}
+,{"title": "Parallel and Asynchronous Programming with Streams and CompletableFuture", "speakers":"Venkat Subramaniam"}
+,{"title": "Make your testing Groovy", "speakers":"Paul King"}
+,{"title": "Kubernetes on AWS Hands-on Workshop", "speakers":"Nathan Peck, Brent Langston"}
+,{"title": "Testing Java Microservices", "speakers":"Alex Soto, Andy Gumbrecht"}
+,{"title": "Hands-on Axon Framework", "speakers":"Frans van Buul, Allard Buijze"}
+,{"title": "Reactive Spring Deep Dive: Building & Testing Reactive Cloud-native Java Microservices", "speakers":"Mark Heckler"}
+,{"title": "Moving Java Forward Faster", "speakers":"Mark Reinhold"}
+,{"title": "A Future without Servers", "speakers":"Danilo Poccia"}
+,{"title": "The Mindful Developer: The Neuroscience of Stress Management", "speakers":"Matthew Renze"}
+,{"title": "Multi Env Deploys with Terraform as Application Glue", "speakers":"Ben Vickers"}
+]

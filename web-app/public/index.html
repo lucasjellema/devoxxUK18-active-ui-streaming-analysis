@@ -19,16 +19,16 @@
         }
     </script>
 <style >
-td { 
-    padding: 10px;
-}
-    .tweetLikeCount {font-weight: bold; background-color: coral}
+td {  padding: 10px; }
+.tweetLikeCount {font-weight: bold; background-color: coral}
+.floatRight {     float: right; }
 </style>
 
 </head>
 
 <body>
     <div class="container-fluid">
+        <img src="images/devoxxUK.png" width="300px" class="floatRight"/>
         <h1>Devoxx UK 2018 Tweet Board</h1>
         <br/>
         <!-- output is container used by sse-handler -->
@@ -49,7 +49,7 @@ td {
         <br/>
         <a href="#" onclick="toggle('runningTop3TweetLikes')">Toggle Running Top 3 Tweet Likes (over last 60 seconds)</a>
         <div id="runningTop3TweetLikes" style="display:none">
-            <h2>Running Top 3 Tweet Likes</h2>
+            <h2>Running Top 3 Tweet Likes (last 30 seconds)</h2>
             <table id="recentLikesTable">
                 <tr>
                     <th>Time</th>

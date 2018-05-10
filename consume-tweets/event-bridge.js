@@ -14,7 +14,7 @@ var consumerOptions = {
     groupId: 'consume-tweets',
     sessionTimeout: 15000,
     protocol: ['roundrobin'],
-    fromOffset: 'earliest' // equivalent of auto.offset.reset valid values are 'none', 'latest', 'earliest'
+    fromOffset: 'latest' // equivalent of auto.offset.reset valid values are 'none', 'latest', 'earliest'
   };
   
 const kafka = require('kafka-node');
@@ -31,7 +31,11 @@ function onError (error) {
   function onMessage (message) {
     console.log('%s read msg Topic="%s" Partition=%s Offset=%d', this.client.clientId, message.topic, message.partition, message.offset);
     console.log("Tweet:"+message.value);
-    eventBridge.publishEvent(message.key, JSON.parse(message.value))
+    var value = JSON.parse(message.value);
+    if (value.tagFilter.startsWith('#')) {
+      value.tagFilter=value.tagFilter.substr(1);
+    }
+    eventBridge.publishEvent(message.key,value)
   }
   
   process.once('SIGINT', function () {

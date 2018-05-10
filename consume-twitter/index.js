@@ -3,7 +3,7 @@ const express = require('express');
 var https = require('https')
 , http = require('http')
 const app = express();
-var PORT = process.env.APP_PORT || 8144;
+var PORT = process.env.PORT || 8144;
 const server = http.createServer(app);
 var APP_VERSION ="0.0.3"
 const { twitterconfig } = require('./twitterconfig');
@@ -38,7 +38,7 @@ var T = new Twit({
 
 
 //var hashtag = "devoxxUK";
-var twiterHashTags = process.env.TWITTER_HASHTAGS||'oraclecode,java,devoxxUK';
+var twiterHashTags = process.env.TWITTER_HASHTAGS||'#oraclecode,#java,#devoxxUK';
 var tracks = { track: twiterHashTags.split(',') };
 
 let tweetStream = T.stream('statuses/filter', tracks)
@@ -63,10 +63,10 @@ function tweetstream(hashtags, tweetStream) {
 const kafka = require('kafka-node');
 const APP_NAME ="TwitterConsumer"
 
-// var EVENT_HUB_PUBLIC_IP = process.env.KAFKA_HOST ||'129.150.77.116';
-// var TOPIC_NAME = process.env.KAFKA_TOPIC ||'a516817-tweetstopic';
-var EVENT_HUB_PUBLIC_IP = process.env.KAFKA_HOST ||'192.168.188.102';
-var TOPIC_NAME = process.env.KAFKA_TOPIC ||'tweets-topic';
+var EVENT_HUB_PUBLIC_IP = process.env.KAFKA_HOST ||'129.150.77.116';
+var TOPIC_NAME = process.env.KAFKA_TOPIC ||'a516817-tweetstopic';
+// var EVENT_HUB_PUBLIC_IP = process.env.KAFKA_HOST ||'192.168.188.102';
+// var TOPIC_NAME = process.env.KAFKA_TOPIC ||'tweets-topic';
 
 var Producer = kafka.Producer;
 var client = new kafka.Client(EVENT_HUB_PUBLIC_IP );
@@ -90,7 +90,7 @@ function produceTweetEvent(tweet) {
       // find out which of the original hashtags { track: ['oraclecode', 'java', 'devoxxUK'] } in the hashtags for this tweet; 
     //that is the one for the tagFilter property
     // select one other hashtag from tweet.entities.hashtags to set in property hashtag
-    var tagFilter="oraclecode";
+    var tagFilter="#devoxxUK";
     var extraHashTag="liveForCode";
     for (var i = 0; i < tweet.entities.hashtags.length; i++) {
       var tag = tweet.entities.hashtags[i].text.toLowerCase();

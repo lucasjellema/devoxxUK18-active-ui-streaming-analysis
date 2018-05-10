@@ -39,7 +39,7 @@ wss.on('connection', (ws) => {
   ws.on('message', function incoming(message) {
     if (message.indexOf("tweetLike") > -1) {
       var tweetLike = JSON.parse(message);
-      var likedTweet = tweetCache[tweetLike.tweetId];
+        var likedTweet = tweetCache[tweetLike.tweetId];
       if (likedTweet) {
         updateWSClients(JSON.stringify({ "eventType": "tweetLiked", "likedTweet": likedTweet }));
         tweetLikeProducer.produceTweetLike(likedTweet);

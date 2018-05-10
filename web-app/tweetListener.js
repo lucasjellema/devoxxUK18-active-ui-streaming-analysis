@@ -1,7 +1,7 @@
 var kafka = require('kafka-node');
 var tweetListener = module.exports;
-var subscribers = [];
 
+var subscribers = [];
 tweetListener.subscribeToTweets = function (callback) {
   subscribers.push(callback);
 }
@@ -27,8 +27,8 @@ consumerGroup.on('error', onError);
 consumerGroup.on('message', onMessage);
 
 function onMessage(message) {
-//  console.log('%s read msg Topic="%s" Partition=%s Offset=%d', this.client.clientId, message.topic, message.partition, message.offset);
-//  console.log("Message Value " + message.value)
+  console.log('%s read msg Topic="%s" Partition=%s Offset=%d', this.client.clientId, message.topic, message.partition, message.offset);
+  console.log("Message Value " + message.value)
 
   subscribers.forEach((subscriber) => {
     subscriber(message.value);

@@ -51,12 +51,11 @@ CREATE TABLE tweets ( eventType varchar,text varchar, isARetweet VARCHAR, author
 CREATE STREAM tweets_st (  tagFilter     VARCHAR  , createdAt VARCHAR, tweetId VARCHAR) WITH (KAFKA_TOPIC='tweets-topic',VALUE_FORMAT='JSON', KEY='tweetId');
 
 select * from tweets;
-select * from tweets_st where len(tweetId) >5;
 
 SET 'auto.offset.reset' = 'earliest';
 
 // for the current period of 5 minutes, running count the total number of occurrences per tagFilter
-select tagFilter, count(*) as tag_cnt \
+    select tagFilter, count(*) as tag_cnt \
 from tweets_st window tumbling (size 5 minute) \
 group by tagFilter;
 
@@ -69,10 +68,9 @@ from tweets WINDOW HOPPING (SIZE 1 minute, ADVANCE BY 30 SECONDS) \
 group by tagFilter;
 
 
-create table tweet_count with (partitions=1) as \
+create table tweet_count_h with (partitions=1) as \
 select tagFilter, count(*) as tag_cnt \
-from tweets_st WINDOW HOPPING (SIZE 250 seconds, ADVANCE BY 10 SECONDS) \
-where len(tweetId) !=0 \
+from tweets_st WINDOW HOPPING (SIZE 60 seconds, ADVANCE BY 10 SECONDS) \
 group by tagFilter;
 
 create table tweet_count with (partitions=1) as select tagFilter, count(*) as tag_cnt from tweets_st WINDOW tumbling (SIZE 120 minutes) group by tagFilter;
@@ -92,24 +90,50 @@ docker exec -it vagrant_broker-1_1 /bin/bash
 
 kafka-topics --delete --zookeeper zookeeper:2181 --topic TWEET_COUNT 
 
-CREATE STREAM tweet_likes ( tweetId VARCHAR) WITH (KAFKA_TOPIC='tweet-like-topic',VALUE_FORMAT='JSON', KEY='tweetId', partitions=1);
+CREATE STREAM tweet_likes ( tweetId VARCHAR) WITH (KAFKA_TOPIC='tweet-like-topic',VALUE_FORMAT='JSON', KEY='tweetId');
+CREATE STREAM tweet_likes2 ( tweetId VARCHAR) WITH (KAFKA_TOPIC='tweet-like-topic',VALUE_FORMAT='JSON');
 
 create stream enriched_likes as select tl.tweetId, t.text, t.rowtime from tweet_likes tl LEFT JOIN tweets t on tl.tweetId = t.tweetId; 
+create stream enriched_likes2 with ( partitions=1) as select tl.tweetId, t.text, t.rowtime from tweet_likes tl LEFT JOIN tweets t on tl.tweetId = t.tweetId; 
+
+select tl_tweetId, text, count(*) as like_count from enriched_likes window hopping (size 30 seconds, advance by 10 seconds) group by tl_tweetId, text;
+
+select tl_tweetId, text, count(*) as like_count from enriched_likes2 window hopping (size 30 seconds, advance by 10 seconds) group by tl_tweetId, text;
 
 print 'tweet-like-topic';
 
 select * from tweet_likes;
 
+
+
 select count(*), tweetId from tweet_likes group by tweetId;
 
-create table like_counts  with (partitions=1) as select count(*) likeCount, tweetId from tweet_likes window tumbling (size 60 seconds) group by tweetId;
+create table like_counts  as select count(*) likeCount, tweetId from tweet_likes window tumbling (size 60 seconds) group by tweetId;
 
+select count(*) likeCount, tweetId from tweet_likes window hopping (size 60 seconds, advance by 20 seconds) group by tweetId;
+
+
+// Web App listens to topic based on windowed_like_counts! 
 create table windowed_like_counts  as select rowtime as timestamp, TIMESTAMPTOSTRING(ROWTIME, 'yyyy-MM-dd HH:mm:ss.SSS') AS WINDOW_START, likeCount, tweetId from like_counts;
 
-        select TIMESTAMPTOSTRING(ROWTIME, 'yyyy-MM-dd HH:mm:ss.SSS') AS WINDOW_START , likeCount, tweetId from like_counts  ;
+select TIMESTAMPTOSTRING(ROWTIME, 'yyyy-MM-dd HH:mm:ss.SSS') AS WINDOW_START , likeCount, tweetId from like_counts  ;
 
-// gives weird hopping behavior - multiple subwindows??
-create table tweet_like_counts  as select count(*) likeCount, tweetId from tweet_likes window hopping (size 60 seconds, advance by 20 seconds) group by tweetId;
+// as many results are produced as there are concurrent windows 
+// there are as many concurrent windows as the number of times the hop advance fits in the size 
+// the aggregate is returned for each of these windows - the oldest (lasting as long as size), and the lastes (only as long as advance)
+create table tweet_like_counts_h  as select count(*) likeCount, tweetId from tweet_likes window hopping (size 60 seconds, advance by 20 seconds) group by tweetId;
+
+select * from tweet_like_counts_h;
+
 
 // gives null pointer exception:
 select twl.likeCount, twl.tweetId, t.text from tweet_like_counts twl  LEFT JOIN tweets t on twl.tweetId = t.tweetId;
+
+
+// clear topic:
+
+kafka-configs --zookeeper vagrant_zookeeper_1:2181 --entity-type topics --alter --add-config retention.ms=1000 --entity-name tweets-topic
+
+kafka-configs --zookeeper vagrant_zookeeper_1:2181 --entity-type topics --describe --entity-name tweets-topic
+
+kafka-configs --zookeeper vagrant_zookeeper_1:2181 --entity-type topics --alter --delete-config retention.ms  --entity-name tweets-topic
